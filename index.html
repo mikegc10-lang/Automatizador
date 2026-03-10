@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root[data-theme="light"] {
+  --bg: #F7F5F2;
+  --bg2: #EEEAE4;
+  --surface: #FFFFFF;
+  --surface2: #F2EEE8;
+  --border: #E0D9CF;
+  --text: #1A1714;
+  --text2: #6B6259;
+  --text3: #9E9489;
+  --accent: #2C5F6E;
+  --accent2: #3D7A8A;
+  --accent-light: #E8F2F5;
+  --gold: #B8976A;
+  --shadow: rgba(44,31,20,0.08);
+  --shadow2: rgba(44,31,20,0.15);
+  --nav-bg: rgba(247,245,242,0.92);
+}
+:root[data-theme="dark"] {
+  --bg: #0E1117;
+  --bg2: #141920;
+  --surface: #1A2130;
+  --surface2: #1F2840;
+  --border: #2A3548;
+  --text: #E8EDF5;
+  --text2: #9BACC4;
+  --text3: #5E7090;
+  --accent: #4A9CB5;
+  --accent2: #5BB8D4;
+  --accent-light: #0E2535;
+  --gold: #C4A97A;
+  --shadow: rgba(0,0,0,0.3);
+  --shadow2: rgba(0,0,0,0.5);
+  --nav-bg: rgba(14,17,23,0.95);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: 80px;
+  transition: background 0.3s, color 0.3s;
+}
+
+h1,h2,h3 { font-family: 'Cormorant Garamond', serif; font-weight: 500; }
+
+/* TOP BAR */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--accent); letter-spacing: 0.5px; }
+.topbar-logo span { color: var(--gold); }
+.theme-toggle {
+  width: 44px; height: 24px;
+  background: var(--border); border: none; border-radius: 12px;
+  cursor: pointer; position: relative; transition: background 0.3s;
+}
+.theme-toggle::after {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent); top: 3px; left: 3px;
+  transition: transform 0.3s;
+}
+[data-theme="dark"] .theme-toggle { background: var(--accent-light); }
+[data-theme="dark"] .theme-toggle::after { transform: translateX(20px); background: var(--accent2); }
+
+/* PAGES */
+.page { display: none; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 8px 0 12px; z-index: 200;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; cursor: pointer; padding: 4px 16px;
+  color: var(--text3); transition: color 0.2s;
+  background: none; border: none; font-family: 'DM Sans', sans-serif;
+  font-size: 10px; letter-spacing: 0.5px;
+}
+.nav-item.active { color: var(--accent); }
+.nav-item svg { width: 22px; height: 22px; }
+.nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); opacity: 0; transition: opacity 0.2s; }
+.nav-item.active .nav-dot { opacity: 1; }
+
+/* ========== HOME PAGE ========== */
+.hero-section {
+  padding: 28px 20px 20px;
+  background: linear-gradient(160deg, var(--bg) 0%, var(--bg2) 100%);
+}
+.hero-greeting { font-size: 13px; color: var(--text3); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 4px; }
+.hero-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 500; color: var(--text); line-height: 1.2; }
+.hero-title span { color: var(--accent); }
+
+.cta-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; margin: 20px 0;
+  padding: 16px 20px;
+  background: var(--accent);
+  color: white; border: none; border-radius: 14px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(44,95,110,0.3);
+}
+.cta-btn:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(44,95,110,0.4); }
+.cta-btn svg { width: 20px; height: 20px; }
+.cta-btn-text { flex: 1; text-align: left; }
+.cta-btn-text small { display: block; font-size: 11px; opacity: 0.75; font-weight: 300; }
+
+.section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 12px; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; }
+.section-badge { font-size: 11px; color: var(--text3); background: var(--surface2); padding: 3px 10px; border-radius: 20px; }
+
+/* APPOINTMENT CARDS */
+.appointments-list { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
+.appt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.appt-card:hover { box-shadow: 0 4px 20px var(--shadow2); transform: translateY(-1px); }
+.appt-card.past { opacity: 0.6; }
+.appt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.appt-service { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; }
+.status-badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 500; letter-spacing: 0.5px; }
+.status-confirmed { background: #E6F5ED; color: #1B7A42; }
+.status-past { background: var(--surface2); color: var(--text3); }
+[data-theme="dark"] .status-confirmed { background: #0D3320; color: #4DC97C; }
+.appt-meta { display: flex; flex-direction: column; gap: 5px; }
+.appt-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text2); }
+.appt-row svg { width: 14px; height: 14px; color: var(--text3); flex-shrink: 0; }
+.appt-actions { display: flex; gap: 8px; margin-top: 12px; }
+.btn-small {
+  flex: 1; padding: 9px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text2); font-size: 12px; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.btn-small:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.btn-small.maps { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+.btn-small.maps:hover { background: var(--accent); color: white; }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text3); }
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state p { font-size: 14px; }
+
+/* ========== MODAL / FORM ========== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 500; display: none; align-items: flex-end;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%; max-height: 92vh;
+  overflow-y: auto; padding: 0 0 32px;
+  animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
+.modal-title-bar { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; }
+.modal-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text2); }
+.modal-body { padding: 20px; }
+
+/* FORM */
+.form-step { display: none; }
+.form-step.active { display: block; }
+.step-indicator { display: flex; gap: 6px; margin-bottom: 20px; }
+.step-dot { height: 3px; border-radius: 2px; flex: 1; background: var(--border); transition: background 0.3s; }
+.step-dot.active { background: var(--accent); }
+.step-dot.done { background: var(--gold); }
+
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 11px; color: var(--text3); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px; display: block; }
+.form-input, .form-select {
+  width: 100%; padding: 13px 16px;
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+  transition: border-color 0.2s, background 0.2s; outline: none;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent); background: var(--surface); }
+.form-select { appearance: none; cursor: pointer; }
+.services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.service-card {
+  padding: 12px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--bg2); cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.service-card.selected { border-color: var(--accent); background: var(--accent-light); }
+.service-card-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.service-card-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.service-card-price { font-size: 12px; color: var(--gold); margin-top: 4px; font-weight: 500; }
+
+.collab-list { display: flex; flex-direction: column; gap: 8px; }
+.collab-card {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--bg2); cursor: pointer; transition: all 0.2s;
+}
+.collab-card.selected { border-color: var(--accent); background: var(--accent-light); }
+.collab-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-size: 16px; color: white; flex-shrink: 0;
+}
+.collab-info { flex: 1; }
+.collab-name { font-size: 14px; font-weight: 500; }
+.collab-spec { font-size: 12px; color: var(--text3); }
+.collab-avail { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+.avail-high { background: #E6F5ED; color: #1B7A42; }
+.avail-mid { background: #FFF8E6; color: #8A6A00; }
+.avail-low { background: #FFF0E6; color: #8A3200; }
+[data-theme="dark"] .avail-high { background: #0D3320; color: #4DC97C; }
+[data-theme="dark"] .avail-mid { background: #2A2000; color: #C9A34D; }
+[data-theme="dark"] .avail-low { background: #2A0D00; color: #C96B4D; }
+
+/* CALENDAR IN FORM */
+.cal-month-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.cal-month-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; }
+.cal-nav-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; color: var(--text2); display: flex; align-items: center; justify-content: center; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; margin-bottom: 4px; }
+.cal-weekday { text-align: center; font-size: 10px; color: var(--text3); padding: 4px; letter-spacing: 0.5px; }
+.cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.cal-day {
+  aspect-ratio: 1; border-radius: 10px; border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; cursor: pointer; transition: all 0.15s;
+  position: relative; font-family: 'DM Sans', sans-serif; color: var(--text);
+  background: transparent;
+}
+.cal-day:disabled { color: var(--text3); opacity: 0.4; cursor: default; }
+.cal-day.avail-green { background: rgba(27,122,66,0.12); }
+.cal-day.avail-yellow { background: rgba(200,160,0,0.14); }
+.cal-day.avail-orange { background: rgba(200,100,20,0.14); }
+.cal-day.avail-red { background: rgba(200,40,40,0.12); }
+.cal-day.selected-day { background: var(--accent) !important; color: white !important; font-weight: 600; }
+.cal-day:not(:disabled):hover { transform: scale(1.08); box-shadow: 0 2px 8px var(--shadow2); }
+.cal-legend { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.cal-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text3); }
+.cal-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+.time-slots { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 12px; }
+.time-slot {
+  padding: 10px; text-align: center; border-radius: 10px;
+  border: 1.5px solid var(--border); background: var(--bg2);
+  cursor: pointer; font-size: 13px; transition: all 0.15s; color: var(--text);
+}
+.time-slot.selected { background: var(--accent); color: white; border-color: var(--accent); }
+.time-slot:disabled { opacity: 0.3; cursor: default; }
+.time-slot:not(:disabled):hover:not(.selected) { border-color: var(--accent); color: var(--accent); }
+
+.form-nav { display: flex; gap: 10px; margin-top: 20px; }
+.btn-back { flex: 0.6; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text2); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+.btn-next { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+.btn-next:hover { background: var(--accent2); }
+.btn-back:hover { background: var(--bg2); }
+
+/* SUCCESS STATE */
+.success-state { text-align: center; padding: 32px 20px; }
+.success-icon { width: 72px; height: 72px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(44,95,110,0.3); }
+.success-icon svg { color: white; width: 32px; height: 32px; }
+.success-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: var(--text2); }
+.confirm-details { background: var(--bg2); border-radius: 14px; padding: 16px; margin: 20px 0; text-align: left; }
+.confirm-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.confirm-row:last-child { border-bottom: none; }
+.confirm-label { color: var(--text3); }
+.confirm-value { color: var(--text); font-weight: 500; }
+
+/* ========== ABOUT PAGE ========== */
+.about-tabs { display: flex; margin: 16px 20px; background: var(--surface2); border-radius: 12px; padding: 4px; }
+.about-tab { flex: 1; padding: 9px; border-radius: 10px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; color: var(--text3); transition: all 0.2s; }
+.about-tab.active { background: var(--surface); color: var(--accent); font-weight: 500; box-shadow: 0 2px 8px var(--shadow); }
+.about-content { padding: 0 20px; }
+.about-panel { display: none; }
+.about-panel.active { display: block; }
+
+.collab-profile { background: var(--surface); border-radius: 20px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); }
+.collab-profile-header { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; }
+.collab-profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--gold)); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 24px; color: white; flex-shrink: 0; }
+.collab-profile-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; }
+.collab-profile-title { font-size: 13px; color: var(--text3); }
+.collab-profile-spec { font-size: 12px; color: var(--accent); margin-top: 2px; font-weight: 500; }
+
+.section-sub { font-family: 'Cormorant Garamond', serif; font-size: 16px; margin: 16px 0 8px; color: var(--gold); }
+.info-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: 12px; color: var(--text2); margin: 3px; }
+.cert-list { display: flex; flex-direction: column; gap: 8px; }
+.cert-item { display: flex; gap: 10px; align-items: flex-start; }
+.cert-icon { width: 28px; height: 28px; border-radius: 8px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.cert-icon svg { width: 14px; height: 14px; color: var(--accent); }
+.cert-name { font-size: 13px; font-weight: 500; }
+.cert-year { font-size: 11px; color: var(--text3); }
+.quote-box { background: var(--accent-light); border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; padding: 14px 16px; margin: 12px 0; }
+.quote-box p { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: var(--text); }
+.location-btn { width: 100%; padding: 13px; border-radius: 12px; border: 1.5px solid var(--accent); background: var(--accent-light); color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; }
+
+.service-item { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+.service-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.service-item-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; }
+.service-item-price { font-size: 16px; color: var(--gold); font-weight: 600; }
+.service-item-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.service-tag { font-size: 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+.service-collabs { margin-top: 8px; }
+.service-collabs-label { font-size: 11px; color: var(--text3); margin-bottom: 5px; }
+.service-collab-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.service-collab-pill { font-size: 12px; background: var(--accent-light); color: var(--accent); border-radius: 20px; padding: 3px 10px; }
+
+/* ========== RESERVATIONS PAGE ========== */
+.reserv-section { padding: 16px 20px; }
+.reserv-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 12px var(--shadow); }
+.reserv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.reserv-service { font-family: 'Cormorant Garamond', serif; font-size: 18px; }
+.reserv-status { font-size: 10px; padding: 3px 10px; border-radius: 20px; }
+.reserv-meta { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.reserv-actions { display: flex; gap: 8px; }
+.btn-modify { flex: 1; padding: 10px; border-radius: 10px; border: 1.5px solid var(--accent); background: var(--accent-light); color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btn-modify:hover { background: var(--accent); color: white; }
+.btn-cancel { flex: 0.6; padding: 10px; border-radius: 10px; border: 1.5px solid #dc3545; background: transparent; color: #dc3545; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btn-cancel:hover { background: rgba(220,53,69,0.1); }
+.whatsapp-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 15px; border-radius: 14px;
+  background: #25D366; color: white; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+  cursor: pointer; margin-top: 8px; text-decoration: none;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.3);
+}
+
+/* ========== CALENDAR PAGE ========== */
+.cal-page { padding: 16px 20px; }
+.cal-filter-bar { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+.filter-chip {
+  padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text2); font-size: 12px;
+  cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+}
+.filter-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+.cal-big { background: var(--surface); border-radius: 20px; padding: 16px; border: 1px solid var(--border); box-shadow: 0 2px 16px var(--shadow); }
+.cal-big-month { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.cal-big-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; }
+.cal-big-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; margin-top: 8px; }
+.cal-big-day {
+  aspect-ratio: 1; border-radius: 12px; border: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 14px; cursor: pointer; transition: all 0.15s;
+  position: relative; font-family: 'DM Sans', sans-serif; color: var(--text); background: transparent;
+}
+.cal-big-day .day-num { font-size: 14px; }
+.cal-big-day .day-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 2px; }
+.cal-big-day.avail-green { background: rgba(27,122,66,0.12); }
+.cal-big-day.avail-yellow { background: rgba(200,160,0,0.13); }
+.cal-big-day.avail-orange { background: rgba(200,100,20,0.13); }
+.cal-big-day.avail-red { background: rgba(200,40,40,0.1); }
+.cal-big-day.selected-day { background: var(--accent) !important; color: white !important; }
+.cal-big-day.today { border: 1.5px solid var(--accent); }
+.cal-big-day:disabled { opacity: 0.3; cursor: default; }
+
+.day-slots-panel { background: var(--surface); border-radius: 16px; padding: 16px; margin-top: 14px; border: 1px solid var(--border); }
+.day-slots-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-bottom: 12px; }
+.slot-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 10px; background: var(--bg2); margin-bottom: 7px; }
+.slot-time { font-size: 14px; font-weight: 500; }
+.slot-status { font-size: 12px; padding: 3px 10px; border-radius: 20px; }
+.slot-available { background: rgba(27,122,66,0.15); color: #1B7A42; }
+.slot-taken { background: var(--surface2); color: var(--text3); }
+[data-theme="dark"] .slot-available { background: #0D3320; color: #4DC97C; }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* TOAST */
+.toast {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+  background: var(--accent); color: white; padding: 10px 20px; border-radius: 20px;
+  font-size: 13px; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* MISC */
+.page-title-bar { padding: 20px 20px 8px; }
+.page-main-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; }
+.page-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">Agenda<span>Pro</span></div>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar modo"></button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ==================== HOME PAGE ==================== -->
+<div class="page active" id="page-home">
+  <div class="hero-section">
+    <div class="hero-greeting">Bienvenido</div>
+    <h1 class="hero-title">Tu próxima <span>cita</span><br>te espera</h1>
+
+    <button class="cta-btn" onclick="openModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div class="cta-btn-text">
+        Agendar cita
+        <small>Disponibilidad en tiempo real</small>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <div class="section-header">
+    <h2 class="section-title">Mis citas</h2>
+    <span class="section-badge" id="appt-count">0 próximas</span>
+  </div>
+
+  <div class="appointments-list" id="appointments-container"></div>
+</div>
+
+<!-- ==================== ABOUT PAGE ==================== -->
+<div class="page" id="page-about">
+  <div class="page-title-bar">
+    <h1 class="page-main-title">Acerca de</h1>
+    <div class="page-sub">Conoce a nuestro equipo y servicios</div>
+  </div>
+
+  <div class="about-tabs">
+    <button class="about-tab active" onclick="switchAboutTab('collab')">Colaboradores</button>
+    <button class="about-tab" onclick="switchAboutTab('services')">Servicios</button>
+  </div>
+
+  <div class="about-content">
+    <!-- COLLABORATORS PANEL -->
+    <div class="about-panel active" id="panel-collab">
+
+      <!-- Dr. García -->
+      <div class="collab-profile">
+        <div class="collab-profile-header">
+          <div class="collab-profile-avatar">MG</div>
+          <div>
+            <div class="collab-profile-name">Dr. Miguel García</div>
+            <div class="collab-profile-title">Médico Especialista</div>
+            <div class="collab-profile-spec">Dermatología Estética</div>
+          </div>
+        </div>
+        <div class="section-sub">Especialidades</div>
+        <div>
+          <span class="info-pill">🔬 Dermatología</span>
+          <span class="info-pill">✨ Estética Facial</span>
+          <span class="info-pill">💉 Toxina Botulínica</span>
+          <span class="info-pill">🌿 Tratamientos Naturales</span>
+        </div>
+        <div class="section-sub">Formación y Certificaciones</div>
+        <div class="cert-list">
+          <div class="cert-item">
+            <div class="cert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div><div class="cert-name">Especialidad en Dermatología – UNAM</div><div class="cert-year">2012</div></div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div><div class="cert-name">Certificación en Medicina Estética – SME</div><div class="cert-year">2015</div></div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div><div class="cert-name">Diplomado en Láser Médico – Hospital Ángeles</div><div class="cert-year">2018</div></div>
+          </div>
+        </div>
+        <div class="section-sub">Experiencia</div>
+        <div class="cert-list">
+          <div class="cert-item">
+            <div class="cert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+            <div><div class="cert-name">Clínica Santa Fe – Médico Titular</div><div class="cert-year">2015 – 2020</div></div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+            <div><div class="cert-name">Consultorio Propio – Director Médico</div><div class="cert-year">2020 – Presente</div></div>
+          </div>
+        </div>
+        <div class="quote-box"><p>"La belleza más auténtica viene del bienestar interior reflejado al exterior."</p></div>
+        <div class="section-sub">Ubicación</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:4px;">📍 Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</div>
+        <button class="location-btn" onclick="openMaps()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Abrir en Google Maps
+        </button>
+      </div>
+
+      <!-- Dra. López -->
+      <div class="collab-profile">
+        <div class="collab-profile-header">
+          <div class="collab-profile-avatar" style="background:linear-gradient(135deg,#7A4E8A,#B8976A)">AL</div>
+          <div>
+            <div class="collab-profile-name">Dra. Ana López</div>
+            <div class="collab-profile-title">Médica Especialista</div>
+            <div class="collab-profile-spec">Nutrición y Bienestar</div>
+          </div>
+        </div>
+        <div class="section-sub">Especialidades</div>
+        <div>
+          <span class="info-pill">🥗 Nutrición Clínica</span>
+          <span class="info-pill">💊 Suplementación</span>
+          <span class="info-pill">🏃 Medicina Deportiva</span>
+        </div>
+        <div class="section-sub">Certificaciones</div>
+        <div class="cert-list">
+          <div class="cert-item">
+            <div class="cert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div><div class="cert-name">Nutriología Clínica – Iberoamericana</div><div class="cert-year">2014</div></div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div><div class="cert-name">Especialidad Medicina del Deporte – TEC</div><div class="cert-year">2017</div></div>
+          </div>
+        </div>
+        <div class="quote-box"><p>"Pequeños cambios consistentes generan transformaciones extraordinarias."</p></div>
+        <div class="section-sub">Ubicación</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:4px;">📍 Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</div>
+        <button class="location-btn" onclick="openMaps()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Abrir en Google Maps
+        </button>
+      </div>
+    </div>
+
+    <!-- SERVICES PANEL -->
+    <div class="about-panel" id="panel-services">
+      <div class="service-item">
+        <div class="service-item-header">
+          <div class="service-item-name">Consulta General</div>
+          <div class="service-item-price">$600</div>
+        </div>
+        <div class="service-item-meta">
+          <span class="service-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 45 min</span>
+          <span class="service-tag">Diagnóstico y tratamiento</span>
+        </div>
+        <div class="service-collabs">
+          <div class="service-collabs-label">Disponible con:</div>
+          <div class="service-collab-pills">
+            <span class="service-collab-pill">Dr. García</span>
+            <span class="service-collab-pill">Dra. López</span>
+          </div>
+        </div>
+      </div>
+      <div class="service-item">
+        <div class="service-item-header">
+          <div class="service-item-name">Aplicación Botox</div>
+          <div class="service-item-price">$3,500</div>
+        </div>
+        <div class="service-item-meta">
+          <span class="service-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 30 min</span>
+          <span class="service-tag">Toxina botulínica</span>
+        </div>
+        <div class="service-collabs">
+          <div class="service-collabs-label">Disponible con:</div>
+          <div class="service-collab-pills">
+            <span class="service-collab-pill">Dr. García</span>
+          </div>
+        </div>
+      </div>
+      <div class="service-item">
+        <div class="service-item-header">
+          <div class="service-item-name">Plan Nutricional</div>
+          <div class="service-item-price">$1,200</div>
+        </div>
+        <div class="service-item-meta">
+          <span class="service-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 60 min</span>
+          <span class="service-tag">Plan personalizado</span>
+        </div>
+        <div class="service-collabs">
+          <div class="service-collabs-label">Disponible con:</div>
+          <div class="service-collab-pills">
+            <span class="service-collab-pill">Dra. López</span>
+          </div>
+        </div>
+      </div>
+      <div class="service-item">
+        <div class="service-item-header">
+          <div class="service-item-name">Limpieza Facial</div>
+          <div class="service-item-price">$900</div>
+        </div>
+        <div class="service-item-meta">
+          <span class="service-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 75 min</span>
+          <span class="service-tag">Tratamiento profundo</span>
+        </div>
+        <div class="service-collabs">
+          <div class="service-collabs-label">Disponible con:</div>
+          <div class="service-collab-pills">
+            <span class="service-collab-pill">Dr. García</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== RESERVATIONS PAGE ==================== -->
+<div class="page" id="page-reservations">
+  <div class="page-title-bar">
+    <h1 class="page-main-title">Reservaciones</h1>
+    <div class="page-sub">Modifica o cancela tus citas</div>
+  </div>
+  <div class="reserv-section" id="reserv-container"></div>
+  <div style="padding:0 20px 20px;">
+    <div style="font-size:13px;color:var(--text3);text-align:center;margin-bottom:10px;">¿Tienes dudas sobre tu cita?</div>
+    <a href="https://wa.me/525500000000?text=Hola%2C%20me%20gustar%C3%ADa%20saber%20m%C3%A1s%20sobre%20mis%20reservaciones" class="whatsapp-btn" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Más dudas, mandar mensaje por WhatsApp
+    </a>
+  </div>
+</div>
+
+<!-- ==================== CALENDAR PAGE ==================== -->
+<div class="page" id="page-calendar">
+  <div class="page-title-bar">
+    <h1 class="page-main-title">Calendario</h1>
+    <div class="page-sub">Disponibilidad del equipo</div>
+  </div>
+  <div class="cal-page">
+    <div class="cal-filter-bar" id="cal-filter-bar">
+      <button class="filter-chip active" onclick="filterCalendar('all', this)">Todos</button>
+      <button class="filter-chip" onclick="filterCalendar('garcia', this)">Dr. García</button>
+      <button class="filter-chip" onclick="filterCalendar('lopez', this)">Dra. López</button>
+    </div>
+
+    <div class="cal-big">
+      <div class="cal-big-month">
+        <button class="cal-nav-btn" onclick="changeCalPage(-1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="cal-big-title" id="cal-big-title"></div>
+        <button class="cal-nav-btn" onclick="changeCalPage(1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="cal-weekdays">
+        <div class="cal-weekday">DOM</div><div class="cal-weekday">LUN</div>
+        <div class="cal-weekday">MAR</div><div class="cal-weekday">MIÉ</div>
+        <div class="cal-weekday">JUE</div><div class="cal-weekday">VIE</div>
+        <div class="cal-weekday">SÁB</div>
+      </div>
+      <div class="cal-big-days" id="cal-big-days"></div>
+
+      <div class="cal-legend" style="margin-top:12px;">
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(27,122,66,0.4)"></div> Alta</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(200,160,0,0.5)"></div> Media</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(200,100,20,0.5)"></div> Poca</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(200,40,40,0.4)"></div> Sin disp.</div>
+      </div>
+    </div>
+
+    <div class="day-slots-panel" id="day-slots-panel" style="display:none">
+      <div class="day-slots-title" id="day-slots-title">Horarios disponibles</div>
+      <div id="day-slots-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BOTTOM NAV ==================== -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('home', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Inicio
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-item" onclick="showPage('about', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    Acerca de
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-item" onclick="showPage('reservations', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Reservas
+    <div class="nav-dot"></div>
+  </button>
+  <button class="nav-item" onclick="showPage('calendar', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="12" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg>
+    Calendario
+    <div class="nav-dot"></div>
+  </button>
+</nav>
+
+<!-- ==================== BOOKING MODAL ==================== -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title-bar">
+      <h2 class="modal-title" id="modal-title">Nueva cita</h2>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="step-indicator">
+        <div class="step-dot active" id="sdot-1"></div>
+        <div class="step-dot" id="sdot-2"></div>
+        <div class="step-dot" id="sdot-3"></div>
+        <div class="step-dot" id="sdot-4"></div>
+      </div>
+
+      <!-- STEP 1: Personal info -->
+      <div class="form-step active" id="step-1">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:4px;">Tus datos</h3>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">Paso 1 de 4</p>
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input type="text" class="form-input" id="f-name" placeholder="Ej. María González">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="tel" class="form-input" id="f-phone" placeholder="55 0000 0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" class="form-input" id="f-email" placeholder="tu@correo.com">
+        </div>
+        <div class="form-nav">
+          <button class="btn-next" onclick="goStep(2)">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Service & collaborator -->
+      <div class="form-step" id="step-2">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:4px;">Servicio</h3>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">Paso 2 de 4</p>
+        <div class="form-group">
+          <label class="form-label">Selecciona el servicio</label>
+          <div class="services-grid">
+            <div class="service-card" onclick="selectService(this, 'Consulta General', 45, '$600')">
+              <div class="service-card-name">Consulta General</div>
+              <div class="service-card-meta">45 min</div>
+              <div class="service-card-price">$600</div>
+            </div>
+            <div class="service-card" onclick="selectService(this, 'Aplicación Botox', 30, '$3,500')">
+              <div class="service-card-name">Aplicación Botox</div>
+              <div class="service-card-meta">30 min</div>
+              <div class="service-card-price">$3,500</div>
+            </div>
+            <div class="service-card" onclick="selectService(this, 'Plan Nutricional', 60, '$1,200')">
+              <div class="service-card-name">Plan Nutricional</div>
+              <div class="service-card-meta">60 min</div>
+              <div class="service-card-price">$1,200</div>
+            </div>
+            <div class="service-card" onclick="selectService(this, 'Limpieza Facial', 75, '$900')">
+              <div class="service-card-name">Limpieza Facial</div>
+              <div class="service-card-meta">75 min</div>
+              <div class="service-card-price">$900</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label class="form-label">Colaborador</label>
+          <div class="collab-list">
+            <div class="collab-card" onclick="selectCollab(this, 'Dr. Miguel García', 'Dermatología Estética', 'high')">
+              <div class="collab-avatar">MG</div>
+              <div class="collab-info">
+                <div class="collab-name">Dr. Miguel García</div>
+                <div class="collab-spec">Dermatología Estética</div>
+              </div>
+              <span class="collab-avail avail-high">Alta disp.</span>
+            </div>
+            <div class="collab-card" onclick="selectCollab(this, 'Dra. Ana López', 'Nutrición y Bienestar', 'mid')">
+              <div class="collab-avatar" style="background:linear-gradient(135deg,#7A4E8A,#B8976A)">AL</div>
+              <div class="collab-info">
+                <div class="collab-name">Dra. Ana López</div>
+                <div class="collab-spec">Nutrición y Bienestar</div>
+              </div>
+              <span class="collab-avail avail-mid">Disponible</span>
+            </div>
+            <div class="collab-card" onclick="selectCollab(this, 'Sin seleccionar', 'Se asignará automáticamente', 'none')">
+              <div class="collab-avatar" style="background:var(--text3)">?</div>
+              <div class="collab-info">
+                <div class="collab-name">Sin seleccionar colaborador</div>
+                <div class="collab-spec" style="color:var(--text3)">Se notificará a todo el equipo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-nav">
+          <button class="btn-back" onclick="goStep(1)">← Atrás</button>
+          <button class="btn-next" onclick="goStep(3)">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Calendar -->
+      <div class="form-step" id="step-3">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:4px;">Fecha y hora</h3>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">Paso 3 de 4</p>
+
+        <div class="cal-month-header">
+          <button class="cal-nav-btn" onclick="changeFormCal(-1)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div class="cal-month-title" id="form-cal-title"></div>
+          <button class="cal-nav-btn" onclick="changeFormCal(1)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <div class="cal-weekdays">
+          <div class="cal-weekday">D</div><div class="cal-weekday">L</div>
+          <div class="cal-weekday">M</div><div class="cal-weekday">M</div>
+          <div class="cal-weekday">J</div><div class="cal-weekday">V</div>
+          <div class="cal-weekday">S</div>
+        </div>
+        <div class="cal-days" id="form-cal-days"></div>
+
+        <div class="cal-legend" style="margin:10px 0;">
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(27,122,66,0.4)"></div> Muy disponible</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(200,160,0,0.5)"></div> Regular</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(200,100,20,0.5)"></div> Poca disp.</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(200,40,40,0.4)"></div> Sin disp.</div>
+        </div>
+
+        <div id="time-section" style="display:none">
+          <label class="form-label" style="margin-bottom:8px;display:block;">Horario disponible</label>
+          <div class="time-slots" id="time-slots-grid"></div>
+        </div>
+
+        <div class="form-nav">
+          <button class="btn-back" onclick="goStep(2)">← Atrás</button>
+          <button class="btn-next" onclick="goStep(4)">Confirmar →</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Confirm -->
+      <div class="form-step" id="step-4">
+        <div class="success-state">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h2 class="success-title">¡Cita confirmada!</h2>
+          <p class="success-sub">Recibirás una confirmación en tu correo y el evento se agregará al calendario.</p>
+          <div class="confirm-details" id="confirm-details"></div>
+          <button class="btn-next" style="width:100%;margin-top:4px;" onclick="finishBooking()">Listo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== STATE ==========
+let currentPage = 'home';
+let darkMode = false;
+let appointments = [
+  { id:1, service:'Consulta General', collaborator:'Dr. Miguel García', date:'2026-03-15', time:'10:00', status:'confirmed', past:false },
+  { id:2, service:'Limpieza Facial', collaborator:'Dr. Miguel García', date:'2026-02-20', time:'11:30', status:'past', past:true }
+];
+let formData = { name:'', phone:'', email:'', service:'', serviceDuration:'', servicePrice:'', collaborator:'', date:'', time:'' };
+let currentFormCalDate = new Date();
+let currentPageCalDate = new Date();
+let calFilter = 'all';
+let editingId = null;
+
+// Availability seeds (just for demo)
+const availData = {
+  garcia: { '2026-03-10':'green','2026-03-11':'green','2026-03-12':'yellow','2026-03-13':'red','2026-03-14':'green','2026-03-15':'orange','2026-03-16':'green','2026-03-17':'yellow','2026-03-18':'green','2026-03-19':'green','2026-03-20':'orange','2026-03-21':'red','2026-03-22':'green','2026-03-23':'green','2026-03-24':'yellow','2026-03-25':'green','2026-03-26':'green','2026-03-27':'orange','2026-03-28':'green','2026-03-29':'yellow','2026-03-30':'green','2026-03-31':'green' },
+  lopez: { '2026-03-10':'yellow','2026-03-11':'orange','2026-03-12':'green','2026-03-13':'green','2026-03-14':'red','2026-03-15':'green','2026-03-16':'yellow','2026-03-17':'green','2026-03-18':'orange','2026-03-19':'green','2026-03-20':'green','2026-03-21':'yellow','2026-03-22':'orange','2026-03-23':'red','2026-03-24':'green','2026-03-25':'green','2026-03-26':'yellow','2026-03-27':'green','2026-03-28':'green','2026-03-29':'orange','2026-03-30':'yellow','2026-03-31':'green' }
+};
+
+const timeSlots = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','16:00','16:30','17:00','17:30','18:00'];
+
+// ========== INIT ==========
+window.onload = () => {
+  renderAppointments();
+  renderCalPage();
+  renderFormCal();
+  renderReservations();
+};
+
+// ========== THEME ==========
+function toggleTheme() {
+  darkMode = !darkMode;
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+}
+
+// ========== NAVIGATION ==========
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  currentPage = name;
+}
+
+// ========== TOAST ==========
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ========== MAPS ==========
+function openMaps() {
+  window.open('https://maps.google.com/?q=Av.+Insurgentes+Sur+1234,+Del+Valle,+CDMX', '_blank');
+}
+
+// ========== RENDER APPOINTMENTS ==========
+function renderAppointments() {
+  const container = document.getElementById('appointments-container');
+  const sorted = [...appointments].sort((a,b) => {
+    if (a.past !== b.past) return a.past ? 1 : -1;
+    return new Date(a.date+' '+a.time) - new Date(b.date+' '+b.time);
+  });
+  const upcoming = sorted.filter(a => !a.past);
+  document.getElementById('appt-count').textContent = upcoming.length + ' próxima' + (upcoming.length !== 1 ? 's' : '');
+
+  if (sorted.length === 0) {
+    container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg><p>Aún no tienes citas agendadas</p></div>`;
+    return;
+  }
+
+  container.innerHTML = sorted.map(a => `
+    <div class="appt-card ${a.past ? 'past' : ''}">
+      <div class="appt-header">
+        <div class="appt-service">${a.service}</div>
+        <span class="status-badge ${a.past ? 'status-past' : 'status-confirmed'}">${a.past ? 'Pasada' : 'Confirmada'}</span>
+      </div>
+      <div class="appt-meta">
+        <div class="appt-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          ${a.collaborator}
+        </div>
+        <div class="appt-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${formatDate(a.date)} · ${a.time}
+        </div>
+      </div>
+      <div class="appt-actions">
+        <button class="btn-small maps" onclick="openMaps()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Cómo llegar
+        </button>
+        ${!a.past ? `<button class="btn-small" onclick="editAppointment(${a.id})">Modificar</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ========== RENDER RESERVATIONS ==========
+function renderReservations() {
+  const container = document.getElementById('reserv-container');
+  const upcomingAppts = appointments.filter(a => !a.past);
+  if (upcomingAppts.length === 0) {
+    container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p>No tienes reservaciones activas</p></div>`;
+    return;
+  }
+  container.innerHTML = upcomingAppts.map(a => `
+    <div class="reserv-card">
+      <div class="reserv-header">
+        <div class="reserv-service">${a.service}</div>
+        <span class="reserv-status status-confirmed">Confirmada</span>
+      </div>
+      <div class="reserv-meta">
+        <div class="appt-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> ${a.collaborator}</div>
+        <div class="appt-row"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${formatDate(a.date)} · ${a.time}</div>
+      </div>
+      <div class="reserv-actions">
+        <button class="btn-modify" onclick="editAppointment(${a.id})">✏️ Modificar cita</button>
+        <button class="btn-cancel" onclick="cancelAppointment(${a.id})">Cancelar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function cancelAppointment(id) {
+  if (confirm('¿Seguro que deseas cancelar esta cita?')) {
+    appointments = appointments.filter(a => a.id !== id);
+    renderAppointments();
+    renderReservations();
+    showToast('Cita cancelada correctamente');
+  }
+}
+
+function editAppointment(id) {
+  editingId = id;
+  const a = appointments.find(x => x.id === id);
+  if (!a) return;
+  formData.service = a.service;
+  formData.collaborator = a.collaborator;
+  formData.date = a.date;
+  formData.time = a.time;
+  document.getElementById('modal-title').textContent = 'Modificar cita';
+  openModal();
+}
+
+// ========== MODAL ==========
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('open');
+  goStep(1, true);
+  resetFormSelections();
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editingId = null;
+}
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+function resetFormSelections() {
+  document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.collab-card').forEach(c => c.classList.remove('selected'));
+  formData = { name:'', phone:'', email:'', service:'', serviceDuration:'', servicePrice:'', collaborator:'', date:'', time:'' };
+  currentFormCalDate = new Date();
+  renderFormCal();
+}
+
+// ========== FORM STEPS ==========
+function goStep(n, silent=false) {
+  if (!silent && n > 1) {
+    if (n === 2 && !validateStep1()) return;
+    if (n === 3 && !validateStep2()) return;
+    if (n === 4 && !validateStep3()) return;
+  }
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  // Step dots
+  for (let i=1; i<=4; i++) {
+    const d = document.getElementById('sdot-'+i);
+    d.classList.remove('active','done');
+    if (i === n) d.classList.add('active');
+    else if (i < n) d.classList.add('done');
+  }
+  if (n === 4) buildConfirmDetails();
+}
+
+function validateStep1() {
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  if (!name) { showToast('Ingresa tu nombre'); return false; }
+  if (!phone) { showToast('Ingresa tu teléfono'); return false; }
+  if (!email) { showToast('Ingresa tu correo'); return false; }
+  formData.name = name; formData.phone = phone; formData.email = email;
+  return true;
+}
+function validateStep2() {
+  if (!formData.service) { showToast('Selecciona un servicio'); return false; }
+  if (!formData.collaborator) { showToast('Selecciona un colaborador'); return false; }
+  return true;
+}
+function validateStep3() {
+  if (!formData.date) { showToast('Selecciona una fecha'); return false; }
+  if (!formData.time) { showToast('Selecciona un horario'); return false; }
+  return true;
+}
+
+function selectService(el, name, dur, price) {
+  document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.service = name; formData.serviceDuration = dur; formData.servicePrice = price;
+}
+function selectCollab(el, name, spec, avail) {
+  document.querySelectorAll('.collab-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.collaborator = name;
+}
+
+// ========== FORM CALENDAR ==========
+function renderFormCal() {
+  const d = currentFormCalDate;
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('form-cal-title').textContent = months[d.getMonth()] + ' ' + d.getFullYear();
+
+  const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+  const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  const today = new Date();
+
+  let html = '';
+  for (let i=0; i<firstDay; i++) html += '<button class="cal-day" disabled></button>';
+  for (let day=1; day<=daysInMonth; day++) {
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const avail = getAvailability(dateStr);
+    const isPast = new Date(dateStr) < new Date(today.toDateString());
+    const isSel = formData.date === dateStr;
+    html += `<button class="cal-day ${isSel ? 'selected-day' : (isPast ? '' : 'avail-'+avail)}" ${isPast ? 'disabled' : ''} onclick="selectFormDate('${dateStr}')">${day}</button>`;
+  }
+  document.getElementById('form-cal-days').innerHTML = html;
+}
+
+function changeFormCal(dir) {
+  currentFormCalDate = new Date(currentFormCalDate.getFullYear(), currentFormCalDate.getMonth()+dir, 1);
+  renderFormCal();
+}
+
+function getAvailability(dateStr) {
+  const combined = { ...availData.garcia };
+  Object.keys(availData.lopez).forEach(k => {
+    const g = availData.garcia[k] || 'green';
+    const l = availData.lopez[k] || 'green';
+    const rank = { green:0, yellow:1, orange:2, red:3 };
+    combined[k] = Object.keys(rank).find(r => rank[r] === Math.round((rank[g]+rank[l])/2)) || 'green';
+  });
+  return combined[dateStr] || 'green';
+}
+
+function selectFormDate(dateStr) {
+  formData.date = dateStr;
+  formData.time = '';
+  renderFormCal();
+  renderTimeSlots(dateStr);
+  document.getElementById('time-section').style.display = 'block';
+}
+
+function renderTimeSlots(dateStr) {
+  const takenSlots = appointments.filter(a => a.date === dateStr).map(a => a.time);
+  const html = timeSlots.map(t => {
+    const taken = takenSlots.includes(t);
+    const isSel = formData.time === t;
+    return `<button class="time-slot ${isSel ? 'selected' : ''}" ${taken ? 'disabled' : ''} onclick="selectTime('${t}')">${t}</button>`;
+  }).join('');
+  document.getElementById('time-slots-grid').innerHTML = html;
+}
+
+function selectTime(t) {
+  formData.time = t;
+  renderTimeSlots(formData.date);
+}
+
+// ========== CONFIRM ==========
+function buildConfirmDetails() {
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const d = new Date(formData.date+'T12:00:00');
+  const dateStr = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById('confirm-details').innerHTML = `
+    <div class="confirm-row"><span class="confirm-label">Servicio</span><span class="confirm-value">${formData.service}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Colaborador</span><span class="confirm-value">${formData.collaborator}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Fecha</span><span class="confirm-value">${dateStr}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Hora</span><span class="confirm-value">${formData.time}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Nombre</span><span class="confirm-value">${formData.name || document.getElementById('f-name').value}</span></div>
+    <div class="confirm-row"><span class="confirm-label">Correo</span><span class="confirm-value">${formData.email || document.getElementById('f-email').value}</span></div>
+  `;
+}
+
+function finishBooking() {
+  const name = document.getElementById('f-name').value || formData.name;
+  const phone = document.getElementById('f-phone').value || formData.phone;
+  const email = document.getElementById('f-email').value || formData.email;
+  if (editingId) {
+    const idx = appointments.findIndex(a => a.id === editingId);
+    if (idx >= 0) {
+      appointments[idx] = { ...appointments[idx], service: formData.service, collaborator: formData.collaborator, date: formData.date, time: formData.time };
+    }
+    showToast('✅ Cita modificada correctamente');
+  } else {
+    appointments.push({
+      id: Date.now(),
+      service: formData.service,
+      collaborator: formData.collaborator,
+      date: formData.date,
+      time: formData.time,
+      status: 'confirmed',
+      past: false
+    });
+    showToast('✅ ¡Cita agendada! Revisa tu correo');
+  }
+  closeModal();
+  renderAppointments();
+  renderReservations();
+}
+
+// ========== ABOUT TABS ==========
+function switchAboutTab(tab) {
+  document.querySelectorAll('.about-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.about-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ========== CALENDAR PAGE ==========
+function renderCalPage() {
+  const d = currentPageCalDate;
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-big-title').textContent = months[d.getMonth()] + ' ' + d.getFullYear();
+
+  const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+  const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+
+  let html = '';
+  for (let i=0; i<firstDay; i++) html += '<button class="cal-big-day" disabled></button>';
+  for (let day=1; day<=daysInMonth; day++) {
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const avail = getFilteredAvailability(dateStr);
+    const isPast = new Date(dateStr) < new Date(today.toDateString());
+    const isToday = dateStr === todayStr;
+    html += `<button class="cal-big-day ${isPast ? '' : 'avail-'+avail} ${isToday ? 'today' : ''}" ${isPast ? 'disabled' : ''} onclick="selectCalDay('${dateStr}', ${day})">
+      <span class="day-num">${day}</span>
+    </button>`;
+  }
+  document.getElementById('cal-big-days').innerHTML = html;
+}
+
+function getFilteredAvailability(dateStr) {
+  if (calFilter === 'garcia') return availData.garcia[dateStr] || 'green';
+  if (calFilter === 'lopez') return availData.lopez[dateStr] || 'green';
+  return getAvailability(dateStr);
+}
+
+function changeCalPage(dir) {
+  currentPageCalDate = new Date(currentPageCalDate.getFullYear(), currentPageCalDate.getMonth()+dir, 1);
+  renderCalPage();
+}
+
+function filterCalendar(filter, btn) {
+  calFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderCalPage();
+  document.getElementById('day-slots-panel').style.display = 'none';
+}
+
+function selectCalDay(dateStr, dayNum) {
+  document.querySelectorAll('.cal-big-day').forEach(d => d.classList.remove('selected-day'));
+  event.target.closest('.cal-big-day').classList.add('selected-day');
+
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const d = new Date(dateStr+'T12:00:00');
+  document.getElementById('day-slots-title').textContent = `${dayNum} ${months[d.getMonth()]} — Horarios`;
+
+  const takenSlots = appointments.filter(a => a.date === dateStr).map(a => a.time);
+  let collabLabel = '';
+  if (calFilter === 'garcia') collabLabel = ' · Dr. García';
+  else if (calFilter === 'lopez') collabLabel = ' · Dra. López';
+
+  const html = timeSlots.map(t => {
+    const taken = takenSlots.includes(t);
+    return `<div class="slot-row">
+      <span class="slot-time">${t}${collabLabel}</span>
+      <span class="slot-status ${taken ? 'slot-taken' : 'slot-available'}">${taken ? 'Ocupado' : 'Disponible'}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('day-slots-content').innerHTML = html;
+  document.getElementById('day-slots-panel').style.display = 'block';
+  document.getElementById('day-slots-panel').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ========== UTILS ==========
+function formatDate(dateStr) {
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const d = new Date(dateStr+'T12:00:00');
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+</script>
+</body>
+</html>
